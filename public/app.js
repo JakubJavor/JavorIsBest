@@ -7,8 +7,19 @@ const firebaseConfig = {
     appId: "1:811514773223:web:2be98250be675db5882c42"
 };
 
+// Inicializace Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+// --- NOVÉ: Zapnutí offline ukládání databáze ---
+firebase.firestore().enablePersistence()
+  .catch((err) => {
+      if (err.code == 'failed-precondition') {
+          console.log('Persistence selhala: Více otevřených tabů');
+      } else if (err.code == 'unimplemented') {
+          console.log('Prohlížeč nepodporuje offline databázi');
+      }
+  });
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -45,6 +56,7 @@ async function addSong() {
 async function loadSongs() {
     const playlist = document.getElementById('playlist');
     try {
+        // Načte data buď ze serveru, nebo z lokální paměti (pokud jsi offline)
         const snapshot = await db.collection('songs').orderBy('createdAt', 'desc').get();
         playlist.innerHTML = "";
         
@@ -63,7 +75,7 @@ async function loadSongs() {
             `;
         });
     } catch (e) {
-        playlist.innerHTML = "<p>Chyba načítání.</p>";
+        playlist.innerHTML = "<p>Chyba načítání databáze.</p>";
     }
 }
 
