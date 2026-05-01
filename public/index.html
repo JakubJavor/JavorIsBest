@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Music Cloud</title>
+    <title>Music Cloud v2.1</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
@@ -13,20 +13,22 @@
 <body>
     <div class="app-container">
         <header>
+            <div class="version-tag">Verze 2.1</div>
             <h1>🎵 Moje Hudba</h1>
-            <p class="subtitle">GitHub & Firebase Storage Edition</p>
+            <p class="subtitle">Offline Cloud Player</p>
+            <button onclick="location.reload(true)" class="refresh-btn">🔄 Obnovit appku</button>
         </header>
         
         <div class="add-section">
-            <h3>Přidat novou skladbu</h3>
+            <h3>Přidat skladbu</h3>
             <input type="text" id="songName" placeholder="Název písničky">
-            <input type="text" id="githubUrl" placeholder="GitHub Raw URL (https://...)">
+            <input type="text" id="githubUrl" placeholder="GitHub Raw URL">
             <button onclick="addSong()" id="addBtn">Uložit do knihovny</button>
             <div id="status"></div>
         </div>
 
         <div id="playlist" class="playlist">
-            <div class="loader">Načítám tvůj playlist...</div>
+            <div class="loader">Načítám...</div>
         </div>
     </div>
     <script src="app.js"></script>

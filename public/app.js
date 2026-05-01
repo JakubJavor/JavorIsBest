@@ -7,35 +7,21 @@ const firebaseConfig = {
     appId: "1:811514773223:web:2be98250be675db5882c42"
 };
 
-// Inicializace Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// --- NOVÉ: Zapnutí offline ukládání databáze ---
+// AKTIVACE OFFLINE DATABÁZE
 firebase.firestore().enablePersistence()
-  .catch((err) => {
-      if (err.code == 'failed-precondition') {
-          console.log('Persistence selhala: Více otevřených tabů');
-      } else if (err.code == 'unimplemented') {
-          console.log('Prohlížeč nepodporuje offline databázi');
-      }
-  });
+  .catch((err) => console.error("Persistence selhala", err));
 
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js');
-    });
+    navigator.serviceWorker.register('sw.js');
 }
 
 async function addSong() {
     const name = document.getElementById('songName').value;
     const url = document.getElementById('githubUrl').value;
-    const status = document.getElementById('status');
-
-    if (!name || !url) return alert("Vyplň název i URL!");
-    if (!url.startsWith('https://')) return alert("URL musí začínat https://");
-
-    status.innerText = "Ukládám do databáze...";
+    if (!name || !url) return alert("Vyplň vše!");
 
     try {
         await db.collection('songs').add({
@@ -43,25 +29,29 @@ async function addSong() {
             url: url,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        
-        status.innerText = "Uloženo!";
         document.getElementById('songName').value = "";
         document.getElementById('githubUrl').value = "";
         loadSongs();
-    } catch (e) {
-        status.innerText = "Chyba: Zkontroluj Firestore Rules!";
+    } catch (e) { alert("Chyba při ukládání!"); }
+}
+
+// NOVÁ FUNKCE: Mazání písničky
+async function deleteSong(id) {
+    if(confirm("Opravdu smazat?")) {
+        await db.collection('songs').doc(id).delete();
+        loadSongs();
     }
 }
 
 async function loadSongs() {
     const playlist = document.getElementById('playlist');
     try {
-        // Načte data buď ze serveru, nebo z lokální paměti (pokud jsi offline)
+        // Načítání funguje i offline díky persistence
         const snapshot = await db.collection('songs').orderBy('createdAt', 'desc').get();
         playlist.innerHTML = "";
         
         if (snapshot.empty) {
-            playlist.innerHTML = "<p style='text-align:center; opacity:0.5;'>Knihovna je prázdná.</p>";
+            playlist.innerHTML = "<p class='empty-msg'>Knihovna je prázdná.</p>";
             return;
         }
 
@@ -69,14 +59,15 @@ async function loadSongs() {
             const song = doc.data();
             playlist.innerHTML += `
                 <div class="song-card">
-                    <span class="song-title">${song.name}</span>
-                    <audio controls preload="none" src="${song.url}"></audio>
+                    <div class="card-header">
+                        <span class="song-title">${song.name}</span>
+                        <button class="delete-btn" onclick="deleteSong('${doc.id}')">🗑️</button>
+                    </div>
+                    <audio controls preload="metadata" src="${song.url}"></audio>
                 </div>
             `;
         });
-    } catch (e) {
-        playlist.innerHTML = "<p>Chyba načítání databáze.</p>";
-    }
+    } catch (e) { playlist.innerHTML = "<p>Offline režim aktivní, ale data chybí.</p>"; }
 }
 
 loadSongs();
