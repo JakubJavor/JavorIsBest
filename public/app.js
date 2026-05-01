@@ -93,7 +93,7 @@ async function loadSongs() {
                     <div class="song-card">
                         <span class="song-title">${song.name}</span>
                         <audio controls preload="metadata" 
-                            src="${song.url}" 
+                            src="${song.url}?t=${new Date().getTime()}"
                             onerror="console.error('Nelze načíst audio: ${song.url}')">
                         </audio>
                     </div>

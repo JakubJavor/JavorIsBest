@@ -1,4 +1,4 @@
-const CACHE_NAME = 'music-cache-v3'; // Změna verze vynutí aktualizaci u uživatele
+const CACHE_NAME = 'music-cache-v5'; // Změna verze vynutí aktualizaci u uživatele
 
 // Seznam souborů, které se mají uložit pro offline start aplikace
 const ASSETS_TO_CACHE = [
