@@ -10,9 +10,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// AKTIVACE OFFLINE DATABÁZE
-firebase.firestore().enablePersistence()
-  .catch((err) => console.error("Persistence selhala", err));
+// Aktivace offline databáze
+firebase.firestore().enablePersistence().catch(err => console.error(err));
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
@@ -21,7 +20,7 @@ if ('serviceWorker' in navigator) {
 async function addSong() {
     const name = document.getElementById('songName').value;
     const url = document.getElementById('githubUrl').value;
-    if (!name || !url) return alert("Vyplň vše!");
+    if (!name || !url) return alert("Musíš vyplnit název i URL!");
 
     try {
         await db.collection('songs').add({
@@ -35,9 +34,8 @@ async function addSong() {
     } catch (e) { alert("Chyba při ukládání!"); }
 }
 
-// NOVÁ FUNKCE: Mazání písničky
 async function deleteSong(id) {
-    if(confirm("Opravdu smazat?")) {
+    if(confirm("Smazat tuto písničku z knihovny?")) {
         await db.collection('songs').doc(id).delete();
         loadSongs();
     }
@@ -46,12 +44,11 @@ async function deleteSong(id) {
 async function loadSongs() {
     const playlist = document.getElementById('playlist');
     try {
-        // Načítání funguje i offline díky persistence
         const snapshot = await db.collection('songs').orderBy('createdAt', 'desc').get();
         playlist.innerHTML = "";
         
         if (snapshot.empty) {
-            playlist.innerHTML = "<p class='empty-msg'>Knihovna je prázdná.</p>";
+            playlist.innerHTML = "<p class='empty-msg'>Knihovna je zatím prázdná.</p>";
             return;
         }
 
@@ -63,11 +60,13 @@ async function loadSongs() {
                         <span class="song-title">${song.name}</span>
                         <button class="delete-btn" onclick="deleteSong('${doc.id}')">🗑️</button>
                     </div>
-                    <audio controls preload="metadata" src="${song.url}"></audio>
+                    <audio controls preload="metadata" crossorigin="anonymous" src="${song.url}"></audio>
                 </div>
             `;
         });
-    } catch (e) { playlist.innerHTML = "<p>Offline režim aktivní, ale data chybí.</p>"; }
+    } catch (e) { 
+        playlist.innerHTML = "<p class='empty-msg'>Offline režim: Písničky se načítají z paměti telefonu.</p>"; 
+    }
 }
 
 loadSongs();
