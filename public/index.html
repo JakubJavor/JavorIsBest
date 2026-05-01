@@ -2,41 +2,29 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Music Cloud v2.2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Můj Offline Přehrávač</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script>
-    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/192/3844/3844724.png">
 </head>
 <body>
     <div class="app-container">
-        <header class="main-header">
-            <div class="header-top">
-                <span class="version-tag">v2.2</span>
-                <button onclick="location.reload(true)" class="refresh-btn">🔄 Aktualizovat</button>
-            </div>
-            <h1>🎵 Moje Hudba</h1>
-            <p class="subtitle">Všechny skladby offline</p>
-        </header>
+        <h1>🎵 Můj Archiv</h1>
         
-        <main class="content">
-            <div class="add-section">
-                <h3>Přidat novou skladbu</h3>
-                <div class="input-group">
-                    <input type="text" id="songName" placeholder="Název písničky">
-                    <input type="text" id="githubUrl" placeholder="GitHub Raw URL (https://...)">
-                </div>
-                <button onclick="addSong()" id="addBtn">Uložit do knihovny</button>
-                <div id="status"></div>
-            </div>
+        <div class="upload-section">
+            <input type="file" id="audioInput" accept="audio/mp3">
+            <button onclick="uploadFiles()" id="uploadBtn">Nahrát MP3</button>
+            <div id="status"></div>
+        </div>
 
-            <div id="playlist" class="playlist">
-                <div class="loader">Načítám knihovnu...</div>
-            </div>
-        </main>
+        <div id="playlist" class="playlist">
+            <p>Načítám hudbu...</p>
+        </div>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>
